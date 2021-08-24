@@ -30,11 +30,12 @@ class ObtData(scrapy.Spider):
                     page = urllib.request.urlopen(hre)
 
                     soup = BeautifulSoup(page,'html.parser')
-                    tagsRaw = soup.find_all( 'div', {'class': 'video-metadata video-tags-list ordered-label-list cropped' } )
+                    #tagsRaw = soup.find_all( 'div', {'class': 'video-metadata video-tags-list ordered-label-list cropped'}, 'a' )
+                    tagsRew =  soup.find_all(['div' ,{'class': 'video-metadata video-tags-list ordered-label-list cropped opened'} , 'a' , { 'class':'btn btn-default'}] )
 
 
                     z = 1
-                    for i in tagsRaw:
+                    for i in tagsRew:
                         z=z+1
                         print( str(z) + "  "+ str(i.text))
 
