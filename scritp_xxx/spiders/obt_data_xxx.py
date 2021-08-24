@@ -1,20 +1,18 @@
 import scrapy
+import urllib.request
+from bs4 import BeautifulSoup
 from scritp_xxx.repository_xvideos import insertValues
-from scritp_xxx.spiders.obt_tags import ObtTags
-from scrapy.crawler import CrawlerProcess
+
+
 
 class ObtData(scrapy.Spider):
     name = "obtdata"
 
     def start_requests(self):
 
-        for a in range(1,10):
+        for a in range(1, 10):
             url: str = f"https://www.xvideos.com/new/{a}"
             yield scrapy.Request(url=url, callback=self.parse)
-
-
-
-
 
     def parse(self, response):
 
@@ -23,20 +21,22 @@ class ObtData(scrapy.Spider):
             title = xvideo.css('p.title a::attr(title)').getall()
             href = xvideo.css('p.title a::attr(href)').getall()
 
-            for k,h in zip(title,href):
+            for k, h in zip(title, href):
                 k: str = k.lower()
                 if ("venezuela" in k) or ("veneca" in k) or ("venezolana" in k):
-                    hre: str = "https://www.xvideos.com"+h
+
+                    hre: str = f"https://www.xvideos.com{h}"
+
+                    page = urllib.request.urlopen(hre)
+
+                    soup = BeautifulSoup(page,'html.parser')
+                    tagsRaw = soup.find_all( 'div', {'class': 'video-metadata video-tags-list ordered-label-list cropped' } )
 
 
-                    tagsRaw = ObtTags.obtHref(self, hre)
-
-                    for d in tagsRaw:
-                        print( "colombia" + str(d))
-
+                    z = 1
+                    for i in tagsRaw:
+                        z=z+1
+                        print( str(z) + "  "+ str(i.text))
 
                     for t, h in zip(title, href):
-                        insertValues(None, t, tags, "https://www.xvideos.com"+h, "xvideos" )
-
-
-
+                        insertValues(None, t, tags, "https://www.xvideos.com" + h, "xvideos")
