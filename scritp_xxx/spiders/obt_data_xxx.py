@@ -4,13 +4,12 @@ from bs4 import BeautifulSoup
 from scritp_xxx.repository_xvideos import insertValues
 
 
-
 class ObtData(scrapy.Spider):
     name = "obtdata"
 
     def start_requests(self):
 
-        for a in range(1, 10):
+        for a in range(1, 20000):
             url: str = f"https://www.xvideos.com/new/{a}"
             yield scrapy.Request(url=url, callback=self.parse)
 
@@ -29,15 +28,21 @@ class ObtData(scrapy.Spider):
 
                     page = urllib.request.urlopen(hre)
 
-                    soup = BeautifulSoup(page,'html.parser')
-                    #tagsRaw = soup.find_all( 'div', {'class': 'video-metadata video-tags-list ordered-label-list cropped'}, 'a' )
-                    tagsRew =  soup.find_all(['div' ,{'class': 'video-metadata video-tags-list ordered-label-list cropped opened'} , 'a' , { 'class':'btn btn-default'}] )
+                    soup = BeautifulSoup(page, 'html.parser')
 
+                    tags_rew = soup.find('div', {'video-metadata video-tags-list ordered-label-list cropped'})
 
-                    z = 1
-                    for i in tagsRew:
-                        z=z+1
-                        print( str(z) + "  "+ str(i.text))
+                    list_tags = []
 
-                    for t, h in zip(title, href):
-                        insertValues(None, t, tags, "https://www.xvideos.com" + h, "xvideos")
+                    for i in tags_rew.find_all('li'):
+                        list_tags.append(i.text)
+
+                    list_tags.remove('+')
+
+                    del list_tags[0]
+
+                    print(list_tags)
+
+                    insertValues(None, k, str(list_tags), "https://www.xvideos.com" + h, "xvideos")
+
+                    list_tags.clear()
